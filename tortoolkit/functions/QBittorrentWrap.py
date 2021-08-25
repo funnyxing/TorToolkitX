@@ -10,6 +10,7 @@ import traceback
 from datetime import datetime
 from functools import partial
 from random import randint
+import requests
 
 import qbittorrentapi as qba
 from telethon import events
@@ -53,15 +54,34 @@ async def get_client(
             None,
             client.application.set_preferences,
             {
-                "disk_cache": 20,
-                "incomplete_files_ext": True,
-                "max_connec": 3000,
-                "max_connec_per_torrent": 300,
-                "async_io_threads": 6,
+                "disk_cache":64,
+                "incomplete_files_ext":True,
+                "max_connec":3000, 
+                "max_connec_per_torrent":300,
+                "async_io_threads":8,
+                "preallocate_all":True,
+                "upnp":True,
+                "dl_limit":-1,
+                "up_limit":-1,
+                "dht":True,
+                "pex":True,
+                "lsd":True,
+                "encryption":0,
+                "queueing_enabled":True,
+                "max_active_downloads":25,
+                "max_active_torrents":65,
+                "dont_count_slow_torrents":True,
+                "bittorrent_protocol":0,
+                "recheck_completed_torrents":True,
+                "enable_multi_connections_from_same_ip":True,
+                "slow_torrent_dl_rate_threshold":100,
+                "slow_torrent_inactive_timer":600,
+                "add_trackers_enabled": True,
+                "add_trackers":f"{TRACKER_LIST}"
             },
         )
         torlog.debug(
-            "Setting the cache size to 20 incomplete_files_ext:True,max_connec:3000,max_connec_per_torrent:300,async_io_threads:6"
+            "Setting the cache size to 64 incomplete_files_ext:True,max_connec:3000,max_connec_per_torrent:300,async_io_threads:8"
         )
         return client
     except qba.LoginFailed as e:
@@ -666,7 +686,7 @@ async def get_confirm_callback(e, lis):
     raise events.StopPropagation()
 
 
-# quick asycn functions
+# quick async functions
 
 
 async def get_torrent_info(client, ehash=None):
@@ -677,3 +697,29 @@ async def get_torrent_info(client, ehash=None):
         return await aloop.run_in_executor(
             None, partial(client.torrents_info, torrent_hashes=ehash)
         )
+
+
+# QBT Trackers
+def gettrackers(urls,delimeter=" "):
+    tracker = ""
+    for url in urls.split(delimeter):
+        if len(urls) == 0:
+            torlog.info("Tracker urls not provided!")
+            continue
+        response = requests.get(url)
+        if response.status_code == 200:
+            tracker+= response.text
+    trackerlist = set(tracker.split("\n"))
+    if "" in trackerlist:
+        trackerlist.remove("")
+    return "\n\n".join(trackerlist)
+
+try:
+    TRACKER_LIST = gettrackers("https://raw.githubusercontent.com/XIU2/TrackersListCollection/master/all.txt https://ngosang.github.io/trackerslist/trackers_all_http.txt https://newtrackon.com/api/all https://raw.githubusercontent.com/DeSireFire/animeTrackerList/master/AT_all.txt https://raw.githubusercontent.com/hezhijie0327/Trackerslist/main/trackerslist_tracker.txt https://raw.githubusercontent.com/hezhijie0327/Trackerslist/main/trackerslist_exclude.txt")
+    if len(TRACKER_LIST) == 0:
+        raise KeyError
+    if len(TRACKER_LIST) > 0:
+        torlog.info("Downloading Trackers for qBittorrent")
+except KeyError:
+    TRACKER_LIST = ""
+##

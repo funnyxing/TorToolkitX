@@ -27,6 +27,7 @@ Table of Content
 # Features
 Following are some awesome features offered by this bot:-
 - Using the best torrent client to deal with torrent : [qBittorrent](https://github.com/qbittorrent/qBittorrent)
+- Customised QBT engine with Custom Trackers
 - You can choose which files you want to download from the torrent.
 - A glorious settings menu from you can control the bot.
 - If the bot is in the group, the users have their own settings like:
@@ -255,6 +256,10 @@ Steps:-
 
 - `USER_CAP_ENABLE` : Work in progress
 - `USER_CAP_LIMIT` : Work in progress
+
+- TO MODIFY CUSTOM TRACKERS URL ...go to line `718` in `tortoolkit/functions/QBittorrentWrap.py` or [click here to](https://github.com/XcodersHub/TorToolkitX/blob/master/tortoolkit/functions/QBittorrentWrap.py#L718) to see it...
+
+- To modify QBT engine Preferences...go to line `57-80` in `tortoolkit/functions/QBittorrentWrap.py` or [click here to](https://github.com/XcodersHub/TorToolkitX/blob/master/tortoolkit/functions/QBittorrentWrap.py#L57-L80) to see it...
 
 ## **Rest Variables are not to be changed** 
 
